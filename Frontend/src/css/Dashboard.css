@@ -1,0 +1,56 @@
+.navbar-custom {
+  background: linear-gradient(to right, #01773e, #00a54d);
+  border-bottom-left-radius: 50% 20%;
+  border-bottom-right-radius: 50% 20%;
+  color: white;
+}
+
+.sidebar-custom {
+  background: linear-gradient(to bottom, #01773e, #05aa52);
+  border-top-right-radius: 50% 20%;
+  border-bottom-right-radius: 50% 20%;
+  color: white;
+}
+
+.sidebar-custom nav button {
+  background-color: transparent;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  text-align: left;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar-custom nav button:hover,
+.sidebar-custom nav button.active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-custom nav {
+  margin-top: 20px;
+  padding-left: 10px;
+}
+
+.sidebar-custom nav .submenu {
+  margin-top: 20px;
+  padding-left: 20px;
+}
+
+.main-content {
+  background-color: #F7FAFC;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.navbar-custom .logout-button {
+  background-color: #E53E3E;
+  border-radius: 20px;
+  padding: 5px 15px;
+  transition: background-color 0.3s ease;
+}
+
+.navbar-custom .logout-button:hover {
+  background-color: #C53030;
+}

@@ -1,0 +1,141 @@
+.body1{
+  background-image: url('../image/Fondo1.png'); /* Ajusta la ruta según corresponda */
+  background-size: cover; /* Hace que la imagen cubra toda la página */
+  background-position: center; /* Centra la imagen */
+  background-repeat: no-repeat; /* Evita que la imagen se repita */
+  background-attachment: scroll;
+}
+
+
+/* Estilo general */
+.main-content1 {
+  width: 40%;
+  height: 50vh;
+  
+  margin: 0 auto;                     /* Centrado horizontal */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border-radius: 10px;
+  
+}
+
+/* Estilo para el botón */
+.button {
+  background-color: #1e744c; /* Fondo verde */
+  color: white;              /* Texto blanco */
+  border: 2px solid #000;    /* Borde negro */
+  padding: 0.8rem 2rem;      /* Espaciado dentro del botón */
+  margin-top: 1.2em;         /* Espacio entre el botón y el input */
+  border-radius: 4px;        /* Bordes redondeados */
+  cursor: pointer;          /* Cambiar el cursor al pasar el ratón */
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #155d3b; /* Fondo verde más oscuro al pasar el mouse */
+}
+
+
+/* Estilo de la sección de información de la empresa */
+.company__info {
+  
+  background-color: #1e744c;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  padding: 2rem;
+  text-align: center;
+  width: 300px;  /* Ajusta el ancho deseado */
+  height: 400px; /* Ajusta la altura deseada */
+}
+
+.logo {
+  height: 150px;
+  margin-bottom: 1rem;
+  transition: transform 0.5s ease; /* Animación suave */
+}
+
+.logo:hover {
+  transform: rotate(360deg); /* Gira 360 grados al pasar el mouse */
+}
+
+.company__info h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.company__info p {
+  font-size: 0.8rem;
+  margin-top: auto;
+}
+
+/* Estilo de la sección del formulario de login */
+.login_form {
+  background-color: rgba(255, 255, 255, 0.8); /* Blanco con 80% de opacidad */
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  border-top: 1px solid #dbdbdb;
+  border-right: 1px solid #dfdddd;
+  padding: 2rem;
+  width: 100%;
+}
+
+.login_form h2 {
+  color: #1e744c;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.login_form label {
+  color: black
+}
+.login_form input {
+  background-color: #fff;
+  border: 1px solid #000;
+  color: #000;
+}
+
+.form__input {
+  width: 90%;
+  border: 0;
+  border-bottom: 1px solid #ffffff;
+  padding: 1em .1em .1em;
+  outline: none;
+  margin: 0.5em 0;
+  transition: border-color 0.3s;
+}
+
+.form__input:focus {
+  border-bottom-color: #008080;
+  box-shadow: 0 0 5px rgba(248, 248, 248, 0.4);
+  border-radius: 4px;
+}
+
+
+
+
+/* Responsive */
+@media screen and (max-width: 640px) {
+  .main-content {
+      width: 90%;
+  }
+  .company__info {
+      display: none;
+  }
+  .login_form {
+      border-top-left-radius: 20px;
+      border-bottom-left-radius: 20px;
+  }
+}
+
+@media screen and (min-width: 642px) and (max-width: 800px) {
+  .main-content {
+      width: 70%;
+  }
+}
