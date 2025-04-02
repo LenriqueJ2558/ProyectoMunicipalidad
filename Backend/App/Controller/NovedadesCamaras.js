@@ -6,9 +6,8 @@ const NovedadesCamara = require('../Models/NovedadesCamara.model');
 // Crear una nueva novedad de cámara
 const createNovedadesCamara = async (req, res) => {
   try {
-    console.log("Archivos recibidos:", req.files);
-    
-    console.log("Datos del body:", req.body);
+    console.log("🔹 Archivos recibidos:", req.files);
+    console.log("🔹 Datos del body:", req.body);
 
     const {
       NombreSupervisor, NombreOperador, Turno, Fecha, GeneralDeNovedades,
@@ -16,40 +15,50 @@ const createNovedadesCamara = async (req, res) => {
       ubicacion_novedades, hora_novedades, Estado, UbiCamara, Lat, Longitud, Localizacion
     } = req.body;
 
-    const video = req.files['video'] ? req.files['video'][0] : null;
-    const imagen = req.files['imagen'] ? req.files['imagen'][0] : null;
+    // Verificar que los archivos de video e imagen existan
+    const video = req.files?.['video']?.[0] || null;
+    const imagen = req.files?.['imagen']?.[0] || null;
+
+    console.log("📌 Video recibido:", video);
+    console.log("📌 Imagen recibida:", imagen);
 
     if (!video && !imagen) {
+      console.warn("⚠️ No se recibió ni video ni imagen.");
       return res.status(400).json({ msg: 'Debe subir al menos un archivo' });
     }
 
-    // Extraer la ruta de los archivos subidos
+    // Generar las rutas para los archivos
     const videoPath = video ? `/uploads/videosNovedades/${video.filename}` : null;
     const imagenPath = imagen ? `/uploads/imagenesNovedades/${imagen.filename}` : null;
 
+    console.log("📌 Ruta del video:", videoPath);
+    console.log("📌 Ruta de la imagen:", imagenPath);
+
+    // Crear la URL completa del video
+    const videoUrl = video ? `http://192.168.16.246:3003/api${videoPath}` : null;
+
+    // Guardar los datos en la base de datos
     const createdNovedades = await NovedadesCamara.create({
       NombreSupervisor, NombreOperador, Turno, Fecha, GeneralDeNovedades,
       TipoDeNovedades, SubTipoNovedades, NumeroDeEstacion, DescripciondeNovedad,
-      Foto: imagenPath,
-      UrlVideo: videoPath,
+      Foto: imagenPath,  // Guardamos la ruta de la imagen
+      UrlVideo: videoUrl,  // Guardamos la URL completa del video
       ubicacion_novedades, hora_novedades, Estado, UbiCamara, Lat, Longitud, Localizacion
     });
 
+    console.log("✅ Novedad creada en la base de datos:", createdNovedades);
+
     return res.status(201).json({
       msg: 'Novedad creada con éxito',
-      videoUrl: `http://192.168.16.246:3003${videoPath}`,
-      
+      videoUrl,  // Incluimos la URL del video en la respuesta
       createdNovedades,
     });
 
   } catch (error) {
-    console.error('Error creando novedades de cámara:', error);
-    return res.status(500).json({ msg: 'Error creando novedades de cámara' });
+    console.error('🚨 Error creando novedades de cámara:', error);
+    return res.status(500).json({ msg: 'Error creando novedades de cámara', error: error.message });
   }
 };
-
-
-
 
 // Actualizar una novedad de cámara
 const updateNovedadesCamara = async (req, res) => {

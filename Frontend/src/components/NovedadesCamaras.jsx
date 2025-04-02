@@ -149,56 +149,68 @@ const handleUpload = async () => {
   const handleAdd = async (data) => {
     setLoading(true);
     try {
-        const formData = new FormData();
-        formData.append('NombreSupervisor', data.NombreSupervisor);
-        formData.append('NombreOperador', data.NombreOperador);
-        formData.append('Turno', data.Turno);
-        formData.append('Fecha', fechaNovedad);
-        formData.append('GeneralDeNovedades', data.GeneralDeNovedades);
-        formData.append('TipoDeNovedades', data.TipoDeNovedades);
-        formData.append('SubTipoNovedades', data.SubTipoNovedades);
-        formData.append('NumeroDeEstacion', data.NumeroDeEstacion);
-        formData.append('DescripciondeNovedad', data.DescripciondeNovedad);
-        formData.append('ubicacion_novedades', data.ubicacion_novedades);
-        formData.append('hora_novedades', horaNovedad);
-        formData.append('Estado', data.Estado);
-        formData.append('UbiCamara', data.UbiCamara);
-        formData.append('Lat', locationData.latitud);
-        formData.append('Longitud', locationData.longitud);
-        formData.append('Localizacion', locationData.localizacion);
-
-        console.log("✅ videoFile:", videoFile);
-        console.log("✅ videoUrl antes de enviar:", videoUrl);
-
-        if (videoFile) {
-            formData.append('video', videoFile);
-        } else {
-            console.warn("⚠️ No se seleccionó ningún archivo de video.");
-        }
-
-        if (previewFoto) {
-            formData.append('imagen', getValues('imagen'));
-        }
-
-        // Verificar los datos que se están enviando
-        formData.forEach((value, key) => {
-            console.log(`📌 ${key}: ${value}`);
-        });
-
-        await axios.post('http://192.168.16.246:3003/api/novedades-camara', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        });
-
-        alert('Novedad agregada con éxito');
-        clearForm();
+      const formData = new FormData();
+  
+      // Agregar los datos del formulario al FormData
+      formData.append('NombreSupervisor', data.NombreSupervisor);
+      formData.append('NombreOperador', data.NombreOperador);
+      formData.append('Turno', data.Turno);
+      formData.append('Fecha', fechaNovedad);
+      formData.append('GeneralDeNovedades', data.GeneralDeNovedades);
+      formData.append('TipoDeNovedades', data.TipoDeNovedades);
+      formData.append('SubTipoNovedades', data.SubTipoNovedades);
+      formData.append('NumeroDeEstacion', data.NumeroDeEstacion);
+      formData.append('DescripciondeNovedad', data.DescripciondeNovedad);
+      formData.append('ubicacion_novedades', data.ubicacion_novedades);
+      formData.append('hora_novedades', horaNovedad);
+      formData.append('Estado', data.Estado);
+      formData.append('UbiCamara', data.UbiCamara);
+      formData.append('Lat', locationData.latitud);
+      formData.append('Longitud', locationData.longitud);
+      formData.append('Localizacion', locationData.localizacion);
+  
+      // Verificar que videoFile sea un archivo y agregarlo a FormData
+      if (videoFile && videoFile instanceof File) {
+        formData.append('video', videoFile); // Asegurarse de que sea un archivo
+      } else {
+        console.error("🚨 videoFile no es un archivo válido o está vacío.");
+      }
+  
+      // Verificar que previewFoto sea un archivo y agregarlo a FormData
+      if (previewFoto && previewFoto instanceof File) {
+        formData.append('imagen', previewFoto); // Usar la foto previsualizada si es un archivo
+      } else {
+        console.error("🚨 previewFoto no es un archivo válido o está vacío.");
+      }
+  
+      // Depuración: Mostrar los valores del FormData
+      for (let pair of formData.entries()) {
+        console.log(`🔹 ${pair[0]}:`, pair[1]);
+      }
+  
+      // Enviar los datos al backend
+      const response = await axios.post('http://192.168.16.246:3003/api/novedades-camara', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+  
+      console.log("✅ Respuesta del servidor:", response.data);
+  
+      // Si el servidor devuelve la URL del video, actualizarla
+      if (response.data.videoUrl) {
+        setVideoUrl(response.data.videoUrl);
+      }
+  
+      alert('Novedad agregada con éxito');
+      clearForm();  // Limpiar el formulario después de la respuesta exitosa
     } catch (error) {
-        console.error("🚨 Error al agregar la novedad:", error);
-        console.log("❌ videoUrl después del error:", videoUrl);
+      console.error("🚨 Error al agregar la novedad:", error);
+      if (error.response) {
+        console.error("📛 Respuesta del servidor:", error.response.data);
+      }
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
-
+  };
   const handleUpdate = async (data) => {
     if (!getValues('Id')) {
       alert('Ingrese el ID para actualizar');
@@ -276,7 +288,7 @@ const handleUpload = async () => {
     if (file && file.type.startsWith('video/')) {
       setProgress(0); // Restablecer progreso antes de cargar el nuevo video
       setVideoUrl(""); // Limpiar la URL anterior
-      
+  
       const formData = new FormData();
       formData.append('video', file);
   
@@ -287,19 +299,19 @@ const handleUpload = async () => {
           setProgress(percent);  // Actualizar el progreso
         }
       })
-        .then(response => {
-          console.log('Respuesta del backend:', response.data);  // Verifica que la respuesta contiene la URL
-          if (response.data.videoUrl) {
-            setProgress(100);  // Asegúrate de que el progreso sea 100 antes de mostrar el enlace
-            setVideoUrl(response.data.videoUrl);  // Guardar la URL del video subido
-          } else {
-            console.error('No se recibió la URL del video.');
-          }
-        })
-        .catch(error => {
-          console.error('Error al subir el video:', error);
-          alert('Hubo un error al subir el video.');
-        });
+      .then(response => {
+        console.log('Respuesta del backend:', response.data);
+        if (response.data.videoUrl) {
+          setProgress(100);  // Asegúrate de que el progreso sea 100 antes de mostrar el enlace
+          setVideoUrl(response.data.videoUrl);  // Guardar la URL del video subido
+        } else {
+          console.error('No se recibió la URL del video.');
+        }
+      })
+      .catch(error => {
+        console.error('Error al subir el video:', error);
+        alert('Hubo un error al subir el video.');
+      });
     } else {
       alert('Por favor selecciona un archivo de video.');
     }
@@ -621,11 +633,13 @@ const handleUpload = async () => {
 
         <div>
         <textarea
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 bg-white text-black"
-          placeholder="Url"
-          value={videoUrl || ''}
-          disabled
-        />
+    
+    className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 bg-white text-black"
+   
+    placeholder="Url"
+    value={videoUrl || ''}
+    disabled
+  />
       </div>
       <div className="flex justify-content-start mt-6 space-x-16">
         <input
