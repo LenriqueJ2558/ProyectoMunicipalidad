@@ -5,42 +5,47 @@ const NovedadesCamara = require('../Models/NovedadesCamara.model');
 
 // Crear una nueva novedad de cámara
 const createNovedadesCamara = async (req, res) => {
-    try {
-      const {
-        NombreSupervisor, NombreOperador, Turno, Fecha, GeneralDeNovedades,
-        TipoDeNovedades, SubTipoNovedades, NumeroDeEstacion, DescripciondeNovedad,
-        ubicacion_novedades, hora_novedades, Estado, UbiCamara, Lat, Longitud, Localizacion
-      } = req.body;
-  
-      const video = req.files['video'] ? req.files['video'][0] : null;
-      const imagen = req.files['imagen'] ? req.files['imagen'][0] : null;
-  
-      if (!video && !imagen) {
-        return res.status(400).json({ msg: 'Debe subir al menos un archivo' });
-      }
-  
-      // Extraer la ruta de los archivos subidos
-      const videoPath = video ? path.join('/uploads/videosNovedades', path.basename(video.path)) : null;
-      const imagenPath = imagen ? path.join('/uploads/imagenesNovedades', path.basename(imagen.path)) : null;
-  
-      const createdNovedades = await NovedadesCamara.create({
-        NombreSupervisor, NombreOperador, Turno, Fecha, GeneralDeNovedades,
-        TipoDeNovedades, SubTipoNovedades, NumeroDeEstacion, DescripciondeNovedad,
-        Foto: imagenPath, // Ajusta según tu esquema de base de datos
-        UrlVideo: videoPath, // Ajusta según tu esquema de base de datos
-        ubicacion_novedades, hora_novedades, Estado, UbiCamara, Lat, Longitud, Localizacion
-      });
-  
-      return res.status(201).json({
-        msg: 'Novedad creada con éxito',
-        videoUrl: `http://192.168.16.246:3003${videoPath}`, // Construimos la URL completa del video
-        createdNovedades,
-      });
-  
-    } catch (error) {
-      console.error('Error creando novedades de cámara:', error);
-      return res.status(500).json({ msg: 'Error creando novedades de cámara' });
+  try {
+    console.log("Archivos recibidos:", req.files);
+    
+    console.log("Datos del body:", req.body);
+
+    const {
+      NombreSupervisor, NombreOperador, Turno, Fecha, GeneralDeNovedades,
+      TipoDeNovedades, SubTipoNovedades, NumeroDeEstacion, DescripciondeNovedad,
+      ubicacion_novedades, hora_novedades, Estado, UbiCamara, Lat, Longitud, Localizacion
+    } = req.body;
+
+    const video = req.files['video'] ? req.files['video'][0] : null;
+    const imagen = req.files['imagen'] ? req.files['imagen'][0] : null;
+
+    if (!video && !imagen) {
+      return res.status(400).json({ msg: 'Debe subir al menos un archivo' });
     }
+
+    // Extraer la ruta de los archivos subidos
+    const videoPath = video ? `/uploads/videosNovedades/${video.filename}` : null;
+    const imagenPath = imagen ? `/uploads/imagenesNovedades/${imagen.filename}` : null;
+
+    const createdNovedades = await NovedadesCamara.create({
+      NombreSupervisor, NombreOperador, Turno, Fecha, GeneralDeNovedades,
+      TipoDeNovedades, SubTipoNovedades, NumeroDeEstacion, DescripciondeNovedad,
+      Foto: imagenPath,
+      UrlVideo: videoPath,
+      ubicacion_novedades, hora_novedades, Estado, UbiCamara, Lat, Longitud, Localizacion
+    });
+
+    return res.status(201).json({
+      msg: 'Novedad creada con éxito',
+      videoUrl: `http://192.168.16.246:3003${videoPath}`,
+      
+      createdNovedades,
+    });
+
+  } catch (error) {
+    console.error('Error creando novedades de cámara:', error);
+    return res.status(500).json({ msg: 'Error creando novedades de cámara' });
+  }
 };
 
 

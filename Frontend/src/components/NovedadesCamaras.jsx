@@ -16,6 +16,7 @@ const FormularioNovedades = () => {
   const [selectedLocation, setSelectedLocation] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [videoFile, setVideoFile] = useState(null);
+  const [progress, setProgress] = useState(0);
   const [locationData, setLocationData] = useState({
     longitud: '',
     latitud: '',
@@ -28,6 +29,30 @@ const FormularioNovedades = () => {
     setFechaNovedad(fecha);
     setHoraNovedad(hora);
   };
+  const handleVideoChange = (e) => {
+    setVideo(e.target.files[0]);
+    setUploadProgress(0); // Reiniciar progreso al seleccionar un nuevo archivo
+};
+const handleUpload = async () => {
+  if (!video) return;
+
+  const formData = new FormData();
+  formData.append("video", video);
+
+  try {
+      const response = await axios.post("http://192.168.16.246:3003/api/novedades-camara", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+          onUploadProgress: (progressEvent) => {
+              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              setUploadProgress(percentCompleted);
+          },
+      });
+
+      setVideoURL(response.data.videoUrl); // Guardar la URL del video subido
+  } catch (error) {
+      console.error("Error al subir el video", error);
+  }
+};
 
 
   const fetchLocationData = async (locationName) => {
@@ -124,54 +149,55 @@ const FormularioNovedades = () => {
   const handleAdd = async (data) => {
     setLoading(true);
     try {
-      
-  
-      const formData = new FormData();
-      formData.append('NombreSupervisor', data.NombreSupervisor); // Asegúrate de que el nombre esté aquí
-      formData.append('NombreOperador', data.NombreOperador);
-      formData.append('Turno', data.Turno);
-      formData.append('Fecha', fechaNovedad);
-      formData.append('GeneralDeNovedades', data.GeneralDeNovedades);
-      formData.append('TipoDeNovedades', data.TipoDeNovedades);
-      formData.append('SubTipoNovedades', data.SubTipoNovedades);
-      formData.append('NumeroDeEstacion', data.NumeroDeEstacion);
-      formData.append('DescripciondeNovedad', data.DescripciondeNovedad);
-      formData.append('ubicacion_novedades', data.ubicacion_novedades);
-      formData.append('hora_novedades', horaNovedad);
-      formData.append('Estado', data.Estado);
-      formData.append('UbiCamara', data.UbiCamara);
-      formData.append('Lat', locationData.latitud);
-      formData.append('Longitud', locationData.longitud);
-      formData.append('Localizacion', locationData.localizacion);
-  
-      if (videoFile) {
-        formData.append('video', videoFile);
-      }
+        const formData = new FormData();
+        formData.append('NombreSupervisor', data.NombreSupervisor);
+        formData.append('NombreOperador', data.NombreOperador);
+        formData.append('Turno', data.Turno);
+        formData.append('Fecha', fechaNovedad);
+        formData.append('GeneralDeNovedades', data.GeneralDeNovedades);
+        formData.append('TipoDeNovedades', data.TipoDeNovedades);
+        formData.append('SubTipoNovedades', data.SubTipoNovedades);
+        formData.append('NumeroDeEstacion', data.NumeroDeEstacion);
+        formData.append('DescripciondeNovedad', data.DescripciondeNovedad);
+        formData.append('ubicacion_novedades', data.ubicacion_novedades);
+        formData.append('hora_novedades', horaNovedad);
+        formData.append('Estado', data.Estado);
+        formData.append('UbiCamara', data.UbiCamara);
+        formData.append('Lat', locationData.latitud);
+        formData.append('Longitud', locationData.longitud);
+        formData.append('Localizacion', locationData.localizacion);
 
-      
-  
-      if (previewFoto) {
-        formData.append('imagen', getValues('imagen')); // Asegúrate de que este campo coincida con el nombre en el backend
-      }
-  
-      formData.forEach((value, key) => {
-        console.log(`${key}: ${value}`);
-      });
-  
-      await axios.post('http://192.168.16.246:3003/api/novedades-camara', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      alert('Novedad agregada con éxito');
-      clearForm();
+        console.log("✅ videoFile:", videoFile);
+        console.log("✅ videoUrl antes de enviar:", videoUrl);
+
+        if (videoFile) {
+            formData.append('video', videoFile);
+        } else {
+            console.warn("⚠️ No se seleccionó ningún archivo de video.");
+        }
+
+        if (previewFoto) {
+            formData.append('imagen', getValues('imagen'));
+        }
+
+        // Verificar los datos que se están enviando
+        formData.forEach((value, key) => {
+            console.log(`📌 ${key}: ${value}`);
+        });
+
+        await axios.post('http://192.168.16.246:3003/api/novedades-camara', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+
+        alert('Novedad agregada con éxito');
+        clearForm();
     } catch (error) {
-      alert('Error al agregar la novedad');
-      console.log(error)
+        console.error("🚨 Error al agregar la novedad:", error);
+        console.log("❌ videoUrl después del error:", videoUrl);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
   const handleUpdate = async (data) => {
     if (!getValues('Id')) {
@@ -237,6 +263,7 @@ const FormularioNovedades = () => {
     }
   };
 
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -247,14 +274,27 @@ const FormularioNovedades = () => {
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith('video/')) {
-      setVideoFile(file); // Guardamos el archivo de video
+      setProgress(0); // Restablecer progreso antes de cargar el nuevo video
+      setVideoUrl(""); // Limpiar la URL anterior
+      
       const formData = new FormData();
       formData.append('video', file);
   
-      axios.post('http://192.168.16.246:3003/api/upload/video', formData)
+      // Subir el video y actualizar la barra de progreso
+      axios.post('http://192.168.16.246:3003/api/upload/video', formData, {
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setProgress(percent);  // Actualizar el progreso
+        }
+      })
         .then(response => {
-          console.log('Respuesta del backend:', response.data);
-          setVideoUrl(response.data.videoUrl);  // Actualiza el estado con la URL
+          console.log('Respuesta del backend:', response.data);  // Verifica que la respuesta contiene la URL
+          if (response.data.videoUrl) {
+            setProgress(100);  // Asegúrate de que el progreso sea 100 antes de mostrar el enlace
+            setVideoUrl(response.data.videoUrl);  // Guardar la URL del video subido
+          } else {
+            console.error('No se recibió la URL del video.');
+          }
         })
         .catch(error => {
           console.error('Error al subir el video:', error);
@@ -267,22 +307,28 @@ const FormularioNovedades = () => {
   
   const openVideo = () => {
     if (videoUrl) {
-        const batContent = `"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe" ${videoUrl}`;
-        const blob = new Blob([batContent], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-
-        // Crear un enlace de descarga para el archivo .bat
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "abrirVLC.bat";
-        link.click();
-
-        // Liberar el URL creado para el archivo
-        URL.revokeObjectURL(url);
+      // Obtener la extensión del archivo
+      const videoExtension = videoUrl.split('.').pop().toLowerCase();
+  
+      // Formatos soportados
+      const supportedFormats = ["mp4", "webm", "ogg"];
+  
+      if (supportedFormats.includes(videoExtension)) {
+        // Intentar abrir en una nueva pestaña
+        const videoWindow = window.open(videoUrl, "_blank");
+  
+        if (videoWindow) {
+          alert("El video se ha abierto correctamente.");
+        } else {
+          alert("No se pudo abrir la pestaña del video.");
+        }
+      } else {
+        alert(`El formato de video ${videoExtension.toUpperCase()} no es compatible con Google Chrome.`);
+      }
     } else {
-        alert("No hay video seleccionado.");
+      alert("No hay video seleccionado.");
     }
-};
+  };
   
   
 
@@ -584,6 +630,7 @@ const FormularioNovedades = () => {
       <div className="flex justify-content-start mt-6 space-x-16">
         <input
           type="file"
+          name="video"
           accept="video/*"
           className="hidden"
           id="fileInput"
@@ -602,8 +649,24 @@ const FormularioNovedades = () => {
         >
           Abrir
         </button>
-      </div>
+      </div> 
+      {/* Barra de Progreso */}
+{progress > 0 && progress < 100 && (
+  <div className="mt-4 w-full bg-gray-200 rounded-lg">
+    <div
+      className="bg-green-500 h-2 rounded-lg"
+      style={{ width: `${progress}%` }}
+    />
+  </div>
+)}
 
+{/* Mensaje cuando la carga está completa */}
+{progress === 100 && videoUrl && (
+  <div className="mt-4 text-green-500">
+    <p>Video subido con éxito. Puedes verlo <a href={videoUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500">aquí</a>.</p>
+  </div>
+)}
+      
         
       </div>
           
