@@ -27,38 +27,44 @@ const Login = () => {
   };
 
   return (
-    <div className="main-content1">
-      <div className="company__info">
-        <img src={logo} alt="Logo" className="logo" />
-        <h2>Sub Gerencia de Seguridad Ciudadana</h2>
-        <p>copyright ©company name all rights reserved</p>
-      </div>
-      <div className="login_form">
-        <h2>Inicio de Sesión</h2>
-        <form onSubmit={handleLogin}>
-          <div>
-            <label>Correo:</label>
-            <input
-              type="email"
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-              required
-              className="form__input"
-            />
-          </div>
-          <div>
-            <label>Contraseña:</label>
-            <input
-              type="password"
-              value={contraseña}
-              onChange={(e) => setContraseña(e.target.value)}
-              required
-              className="form__input"
-            />
-          </div>
-          {error && <p className="error">{error}</p>}
-          <button type="submit" className="button">Ingresar</button>
-        </form>
+    <div className="back-white">
+      <div className="main-content1">
+        <div className="company__info">
+          <img src={logo} alt="Logo" className="logo" />
+          <h2>Sub Gerencia de Seguridad Ciudadana</h2>
+        </div>
+        <div className="login_form">
+          <h2>Inicio de Sesión</h2>
+          <form onSubmit={handleLogin}>
+            <div>
+              <label>Correo:</label>
+              <input
+                type="email"
+                value={correo}
+                onChange={(e) => setCorreo(e.target.value)}
+                required
+                placeholder='Ingrese su correo'
+                className="form__input"
+              />
+            </div>
+            <div className='inputpass'>
+              <label>Contraseña:</label>
+              <input
+                type="password"
+                value={contraseña}
+                onChange={(e) => setContraseña(e.target.value)}
+                required
+                placeholder='Ingrese su contraseña'
+                className="form__input"
+              />
+            </div>
+            {error && <p className="error">{error}</p>}
+            <div className="enter-button">
+              <button type="submit" className="button">Ingresar</button>
+            </div>
+          </form><br />
+          <p className='copyright'>copyright © CIEM 2025</p>
+        </div>
       </div>
     </div>
   );
