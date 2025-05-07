@@ -14,6 +14,7 @@ const NombreSupervisores = require('./App/Routers/Supervisores.routes.js')
 const tipodeincidencias = require('./App/Routers/tipoDeIncidencias.routes.js')
 const sequelize = require('./App/config/db.config');
 const videoRoutes = require('./App/Routers/videoRoutes.routes.js');
+const novedadesSerenazgoRoutes = require('./App/Routers/novedadesSerenazgoRoutes.js');
 
 const app = express();
 
@@ -77,7 +78,7 @@ require("./App/Routers/user.routes.js")(app);
 
 // Rutas API
 app.use('/api',empleado,actividad,NovedadesCamara,InfoEstudio,InfoEmpleado,ReporteEmpleado,NombreSupervisores,tipodeincidencias,videoRoutes);
-
+app.use('/api/mobile', novedadesSerenazgoRoutes);
 // Ruta para archivos estáticos (imagenes de empleados)
 app.use('/ProyectoMuni/App/imagenesEmpleados', express.static(path.join(__dirname, 'App/imagenesEmpleados')));
 
