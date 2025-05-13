@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const { authJwt } = require("../middleware");
 const novedadesSerenazgoController =  require('../Controller/novedadesSerenazgoController'); // Asegúrate de ajustar la ruta
 const router = express.Router();
 
@@ -22,9 +23,16 @@ const storage = multer.diskStorage({
   const upload = multer({ storage: storage });
   
   // Ruta para crear una novedad con fotos y videos
-  router.post('/novedades', 
-    upload.fields([{ name: 'foto', maxCount: 1 }, { name: 'video', maxCount: 1 }]), 
-    novedadesSerenazgoController.createNovedad
+  router.post(
+    '/novedades-serenazgo',
+    [authJwt.verifyToken],
+    upload.fields([{ name: 'foto' }, { name: 'video' }]),
+    novedadesSerenazgoController.createNovedadSerenazgo
+  );
+  router.get(
+    '/novedades-serenazgo/mis-novedades',
+    
+    novedadesSerenazgoController.getAllNovedadesSerenazgo
   );
   
   module.exports = router;
