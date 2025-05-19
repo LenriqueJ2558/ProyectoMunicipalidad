@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import "../css/fecha-hora.css"
 
 const FechaHoraActual = ({ onFechaHoraChange }) => {
   const [fecha, setFecha] = useState('');

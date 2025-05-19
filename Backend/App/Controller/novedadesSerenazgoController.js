@@ -24,3 +24,27 @@ exports.createNovedad = async (req, res) => {
       res.status(500).json({ error: 'Error al crear la novedad' });
     }
   };
+  exports.getNovedadesMobile = async (req, res) => {
+    try {
+      const novedades = await NovedadesSerenazgo.findAll({
+        order: [['created_at', 'DESC']],
+      });
+      res.json(novedades);
+    } catch (error) {
+      console.error('Error al obtener novedades:', error);
+      res.status(500).json({ error: 'Error al obtener novedades' });
+    }
+  };
+  exports.getNovedadById = async (req, res) => {
+    const { id } = req.params;
+    try {
+      const novedad = await NovedadesSerenazgo.findByPk(id);
+      if (!novedad) {
+        return res.status(404).json({ error: 'Novedad no encontrada' });
+      }
+      res.json(novedad);
+    } catch (error) {
+      console.error('Error al obtener la novedad:', error);
+      res.status(500).json({ error: 'Error al obtener la novedad' });
+    }
+  };

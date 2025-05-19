@@ -6,6 +6,7 @@ import TipoDeIncidenciasSelect from './TipoDeNovedadesSelect';
 import SubTipoDeNovedadesSelect from './SubTipoDeNovedadesSelect';
 import FechaHoraActual from './FechaHoraActual';
 import AutoResizeTextarea from './textarea';
+import "../css/fecha-hora.css"
 
 const FormularioNovedades = () => {
   const { register, handleSubmit, setValue, getValues, formState: { errors } } = useForm();
@@ -375,7 +376,8 @@ const handleUpload = async () => {
   <h2 className="text-3xl font-bold text-center text-gray-800 flex-1">
     Novedades de Cámaras
   </h2>
-  <div className="text-sm text-gray-600">
+  {/*FECHA Y HORA*/}
+  <div className="text-sm text-gray-600" id='fecha-hora'>
     <FechaHoraActual onFechaHoraChange={handleFechaHoraChange} />
   </div>
 </div>
